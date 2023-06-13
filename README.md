@@ -1,5 +1,5 @@
 # cot_comlist
-Rendering comment widgets anywhere
+Генератор списков комментариев
 
 ## Использование:
 
@@ -7,7 +7,7 @@ Rendering comment widgets anywhere
 {PHP|cot_comlist($tpl, $items, $order, $blacklist, $whitelist, $group, $userid)}
 ```
 
-Назначение параметров (в скобках значение по умолчанию -- если не указано пользователем):
+Назначение параметров:
 * $tpl -- имя шаблона (по умолчанию comlist)
 * $items -- количество выводимых записей (0 -- вывести все)
 * $order -- сортировка (date -- по дате, views -- по просмотрам, rand -- рандомизировать)
@@ -16,7 +16,7 @@ Rendering comment widgets anywhere
 * $group -- сгруппировать по страницам
 * $userid -- только по id пользователя
 
-## В шаблоне генерятс следующие теги:
+## В шаблоне генерятся следующие теги:
 
 * {PAGE_ROW_COMLIST_NUM} -- порядковый номер
 * {PAGE_ROW_COMLIST_ODDEVEN} -- класс odd/even
@@ -32,10 +32,13 @@ Rendering comment widgets anywhere
 
 ### Подключение тегов PAGE_ROW_
 
-Кроме основных тегов плагин генерит весьнабор тегов для родительской страницы (функция cot_generate_usertags)
+Кроме основных тегов плагин генерит весь набор тегов для родительской страницы (функция cot_generate_usertags)
 
 
 ## История:
+
+вер. 1.20 (todo)
+1. Преобразовать параметры черного и белого списков в параментр $mode (по аналогии с [cot_pagelist](https://github.com/seditio/cot_pagelist))
 
 вер. 1.10
 1. Плагин переименован из pagecom в comlist
