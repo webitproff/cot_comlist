@@ -43,9 +43,7 @@ function cot_comlist($tpl = 'comlist', $items = 20, $order = 'date', $blacklist 
 		// All cats except bl/wl
 		foreach ($structure['page'] as $code => $row) {
 			if (cot_auth('page', $code, 'R') &&
-				(!empty($blacklist) && !in_array($code, $bl)
-					|| !empty($whitelist) && in_array($code, $wl)))
-			{
+				(!empty($blacklist) && !in_array($code, $bl) || !empty($whitelist) && in_array($code, $wl))) {
 				$cats[] = $code;
 			}
 		}
@@ -102,8 +100,7 @@ function cot_comlist($tpl = 'comlist', $items = 20, $order = 'date', $blacklist 
 	/* === Hook - Part 1 === */
 	$loop_extplugins = cot_getextplugins('comlist.loop');
 	/* ===== */
-	while ($row = $res->fetch())
-	{
+	while ($row = $res->fetch()) {
 		if (empty($row['page_id']) && isset($structure['page'][$row['com_code']])) {
 			// Category comments
 			$cat = $structure['page'][$row['com_code']];
