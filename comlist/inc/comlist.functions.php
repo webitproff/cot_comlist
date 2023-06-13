@@ -121,18 +121,17 @@ function cot_comlist($tpl = 'comlist', $items = 20, $order = 'date', $blacklist 
 		$com_text = cot_parse($row['com_text'], $cfg['plugin']['comments']['markup']);
 
 		$t->assign(array(
-			'PAGE_ROW_NUM' => $jj,
-			'PAGE_ROW_ODDEVEN' => cot_build_oddeven($jj),
-			'PAGE_ROW_ID' => $row['com_id'],
-			'PAGE_ROW_URL' => cot_url('page', $link_params, '#c'.$row['com_id']),
-			'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
-			'PAGE_ROW_AUTHORNAME' => htmlspecialchars($row['com_author']),
-			'PAGE_ROW_AUTHORID' => $row['com_authorid'],
-			'PAGE_ROW_TEXT' => $com_text,
-			'PAGE_ROW_TEXT_PLAIN' => strip_tags($com_text),
-			'PAGE_ROW_DATE' => cot_date('datetime_medium', $row['com_date']),
-			'PAGE_ROW_DATE_STAMP' => $row['com_date'],
-			'PAGE_ROW_CATTITLE' => htmlspecialchars($structure['page'][$row['page_cat']]['title'])
+			'PAGE_ROW_COMLIST_NUM' => $jj,
+			'PAGE_ROW_COMLIST_ODDEVEN' => cot_build_oddeven($jj),
+			'PAGE_ROW_COMLIST_ID' => $row['com_id'],
+			'PAGE_ROW_COMLIST_URL' => cot_url('page', $link_params, '#c'.$row['com_id']),
+			'PAGE_ROW_COMLIST_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
+			'PAGE_ROW_COMLIST_AUTHORNAME' => htmlspecialchars($row['com_author']),
+			'PAGE_ROW_COMLIST_AUTHORID' => $row['com_authorid'],
+			'PAGE_ROW_COMLIST_TEXT' => $com_text,
+			'PAGE_ROW_COMLIST_TEXT_PLAIN' => strip_tags($com_text),
+			'PAGE_ROW_COMLIST_DATE' => cot_date('datetime_medium', $row['com_date']),
+			'PAGE_ROW_COMLIST_DATE_STAMP' => $row['com_date']
 		));
 
 		/* === Hook - Part 2 === */
