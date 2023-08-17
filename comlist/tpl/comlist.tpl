@@ -1,6 +1,5 @@
 <!-- BEGIN: MAIN -->
-<div id="comlist">
-
+<div id="com2list">
 	<ul class="list-unstyled comments">
 <!-- BEGIN: PAGE_ROW -->
 		<li class="px-3 py-2 mb-3 {PAGE_ROW_COMLIST_ODDEVEN}">
@@ -8,11 +7,11 @@
 <!-- IF {PAGE_ROW_AUTHOR_AVATAR} -->
 				{PAGE_ROW_AUTHOR_AVATAR}
 <!-- ELSE -->
-				<img src="datas/defaultav/blank.png" alt="{PAGE_ROW_COMLIST_AUTHORNAME}" class="img-fluid" />
+				<img src="datas/defaultav/default.png" alt="{PAGE_ROW_COMLIST_AUTHORNAME}" class="img-fluid" />
 <!-- ENDIF -->
 			</figure>
 
-<!-- IF {PAGE_ROW_COMLIST_IS_NUMERIC} -->
+<!-- IF {PAGE_ROW_COMLIST_CODE_IS_NUMERIC} -->
 			<a href="{PAGE_ROW_URL}" class="fw-bold mt-1 d-block">{PAGE_ROW_SHORTTITLE}</a>
 <!-- ELSE -->
 			<a href="{PAGE_ROW_CAT_URL}" class="fw-bold mt-1 d-block">{PAGE_ROW_CAT_TITLE}</a>
@@ -35,6 +34,5 @@
 		</ul>
 	</nav>
 <!-- ENDIF -->
-
 </div>
 <!-- END: MAIN -->
