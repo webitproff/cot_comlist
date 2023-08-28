@@ -2,105 +2,152 @@
 /**
 * Comlist Plugin / Functions
 *
-* @package Comlist
+* @package comlist
 * @author Dmitri Beliavski
-* @copyright (c) 2012-2023 seditio.by
+* @copyright (c) 2023 seditio.by
 */
 
 defined('COT_CODE') or die('Wrong URL');
+
+// define globals
+define('SEDBY_COMLIST_REALM', '[SEDBY] Comlist');
 
 require_once cot_incfile('comments', 'plug');
 require_once cot_incfile('page', 'module');
 
 /**
- * Generates page list widget
- * @param  string  $tpl        Template code
- * @param  integer $items      Number of items to show. 0 - all items
- * @param  string  $order      Sorting order (SQL)
- * @param  string  $extra 		 Custom selection filter (SQL)
- * @param  string  $area 			 Comment area
- * @param  integer $group 	   Group comments by code
- * @param  string  $pagination Pagination parameter name for the URL, e.g. 'pcm'. Make sure it does not conflict with other paginations. Leave it empty to turn off pagination
- * @param  string  $ajax_block DOM block ID for ajax pagination
- * @param  integer $cache_name Cache name
- * @param  integer $cache_ttl  Caching time to live
- * @return string              Parsed HTML
+ * Encrypts or decrypts string
+ *
+ * @param		string	$action	01.	Action (encrypt || decrypt)
+ * @param		string	$string	02.	String to encrypt / decrypt
+ * @param		string	$key		03. Secret key
+ * @param		string	$iv			04. Initialization vector
+ * @param		string	$method	05. Encryption method (optional)
+ * @return	string					Encrypted / decrypted string
  */
+ if (!function_exists('cot_encrypt_decrypt')) {
+	function cot_encrypt_decrypt($action, $string, $key, $iv, $method = '') {
+		$method = empty($method) ? 'AES-256-CBC' : $method;
+		$key = hash('sha256', $key);
+		$iv = substr(hash('sha256', $iv), 0, 16);
 
-function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $group = 0, $pagination = '', $ajax_block = 'com2list', $cache_name = '', $cache_ttl = '') {
-
-	if (empty($pagination) && (Cot::$cfg['plugin']['comlist']['ajax'] == 0) && !empty($cache_name) && !empty($cache_ttl) && (Cot::$cache && Cot::$cache->db->exists($cache_name, '[SEDBY] cot_comlist'))) {
-		$output = Cot::$cache->db->get($cache_name, '[SEDBY] cot_comlist');
+		if ($action == 'encrypt') {
+			$output = openssl_encrypt($string, $method, $key, 0, $iv);
+			$output = base64_encode($output);
+		}
+		elseif ($action == 'decrypt') {
+			$output = base64_decode($string);
+			$output = openssl_decrypt($output, $method, $key, 0, $iv);
+		}
+		return $output;
 	}
+ }
+
+/**
+ * Generates comment list widget
+ *
+ * @param  string  $tpl					01. Template code
+ * @param  integer $items				02. Number of items to show. 0 - show all items
+ * @param  string  $order				03. Sorting order (SQL)
+ * @param  string  $extra				04. Custom selection filter (SQL)
+ * @param  integer $group				05. Group comments by code
+ * @param  string  $pagination	06. Pagination parameter name for the URL, e.g. 'pcm'. Make sure it does not conflict with other paginations. Leave it empty to turn off pagination
+ * @param  string  $ajax_block	07. DOM block ID for ajax pagination
+ * @param  integer $cache_name	08. Cache name
+ * @param  integer $cache_ttl		09. Cache TTL
+ * @return string								Parsed HTML
+ */
+function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $group = 0, $pagination = '', $ajax_block = '', $cache_name = '', $cache_ttl = '') {
+
+	$cache_name = (!empty($cache_name)) ? str_replace(' ', '_', $cache_name) : '';
+
+	if (Cot::$cache && !empty($cache_name) && Cot::$cache->db->exists($cache_name, SEDBY_COMLIST_REALM))
+		$output = Cot::$cache->db->get($cache_name, SEDBY_COMLIST_REALM);
 	else {
+
+		/* === Hook === */
+		foreach (array_merge(cot_getextplugins('comlist.first')) as $pl) {
+			include $pl;
+		}
+		/* ===== */
+
+		if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls']) {
+			$h = $tpl.','.$items.','.$order.','.$extra.','.$group.','.$pagination.','.$ajax_block.','.$cache_name.','.$cache_ttl;
+			$h = cot_encrypt_decrypt('encrypt', $h, Cot::$cfg['plugin']['comlist']['encrypt_key'], Cot::$cfg['plugin']['comlist']['encrypt_iv']);
+			$h = str_replace('=', '', $h);
+		}
+
+		$db_com = Cot::$db->com;
+
+		// Display the items
+		$t = new XTemplate(cot_tplfile($tpl, 'plug'));
+
 		// Get pagination number if necessary
-		if (!empty($pagination)) {
+		if (!empty($pagination))
 			list($pg, $d, $durl) = cot_import_pagenav($pagination, $items);
-		}
-		else {
+		else
 			$d = 0;
-		}
 
 		// Compile items number
-		$sql_items = ($items > 0) ? "LIMIT $d, $items" : '';
+		$sql_limit = ($items > 0) ? "LIMIT $d, $items" : "";
 
 		// Compile order
-		$sql_order = (empty($order)) ? "com_id DESC" : $order;
-		$sql_order = "ORDER BY " . $sql_order;
+		$sql_order = empty($order) ? "" : "ORDER BY $order";
 
 		// Compile group
-		$sql_group = ($group == 1) ? "c.com_id = (SELECT MAX(com_id) FROM ".Cot::$db->com." AS c2 WHERE c2.com_code = c.com_code)" : '';
+		$sql_group = ($group == 1) ? "c.com_id = (SELECT MAX(com_id) FROM " .$db_com . " AS c2 WHERE c2.com_code = c.com_code)" : '';
 
 		// Compile extra SQL condition
-		$sql_extra = (!empty($extra)) ? $extra : '';
+		$sql_extra = (empty($extra)) ? "" : $extra;
 
 		if (!empty($sql_group) && !empty($sql_extra))
-			$sql_cond = "WHERE " . $sql_group ." AND ". $sql_extra;
+			$sql_cond = "WHERE " . $sql_group . " AND " . $sql_extra;
 		elseif (!empty($sql_group) && empty($sql_extra))
 			$sql_cond = "WHERE " . $sql_group;
 		elseif (empty($sql_group) && !empty($sql_extra))
 			$sql_cond = "WHERE " . $sql_extra;
 		else
-			$sql_cond = '';
+			$sql_cond = "";
 
-		// Display the items
-		$t = new XTemplate(cot_tplfile($tpl, 'plug'));
+		$comlist_join_columns = "";
+		$comlist_join_tables = "";
 
-		$join_columns = "";
-		$join_tables = "";
+		// Page Module Support
+		if (Cot::$cfg['plugin']['comlist']['page'] == 1) {
+			$db_pages = Cot::$db->pages;
+			$comlist_join_columns .= " , p.* ";
+			$comlist_join_tables .= "LEFT JOIN $db_pages AS p ON c.com_code = p.page_id AND c.com_area = 'page'";
+		}
+
+		// Users Module Support
+		if (Cot::$cfg['plugin']['comlist']['users'] == 1) {
+			$db_users = Cot::$db->users;
+			$comlist_join_columns .= " , u.* ";
+			$comlist_join_tables .= "LEFT JOIN $db_users AS u ON u.user_id = c.com_authorid";
+		}
 
 		/* === Hook === */
-		foreach (cot_getextplugins('comlist.query') as $pl)
-		{
+		foreach (cot_getextplugins('comlist.query') as $pl) {
 			include $pl;
 		}
 		/* ===== */
 
-		$query = "SELECT c.*, u.*, p.* $join_columns
-			FROM ".Cot::$db->com." AS c
-				LEFT JOIN ".Cot::$db->users." AS u ON u.user_id = c.com_authorid
-				LEFT JOIN ".Cot::$db->pages." AS p ON c.com_code = p.page_id AND c.com_area = 'page'
-			$join_tables
-			$sql_cond
-			$sql_order
-			$sql_items";
-
+		$query = "SELECT c.* $comlist_join_columns FROM $db_com AS c $comlist_join_tables $sql_cond $sql_order $sql_limit";
 		$res = Cot::$db->query($query);
 		$jj = 1;
 
 		/* === Hook - Part 1 === */
-		$loop_extplugins = cot_getextplugins('comlist.loop');
+		$extp = cot_getextplugins('comlist.loop');
 		/* ===== */
 
 		while ($row = $res->fetch()) {
-
-			if ($row['com_area'] == 'page') {
+			if (Cot::$cfg['plugin']['comlist']['page'] == 1 && $row['com_area'] == 'page') {
 				if (empty($row['page_id']) && isset(Cot::$structure[$row['com_area']][$row['com_code']])) {
 					// Category comments
 					$cat = Cot::$structure[$row['com_area']][$row['com_code']];
 					$link_params = array('c' => $row['com_code']);
 					$t->assign(array(
-						'PAGE_ROW_CAT_TITLE' => htmlspecialchars($cat['title']),
+						'PAGE_ROW_CAT_TITLE' => htmlspecialchars($cat['title']) . " (раздел)",
 						'PAGE_ROW_CAT_URL' => cot_url('page', $link_params),
 					));
 				}
@@ -112,7 +159,8 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				}
 			}
 
-			$t->assign(cot_generate_usertags($row, 'PAGE_ROW_AUTHOR_'));
+			if (Cot::$cfg['plugin']['comlist']['users'] == 1)
+				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_AUTHOR_'));
 
 			$com_text = cot_parse($row['com_text'], Cot::$cfg['plugin']['comments']['markup']);
 
@@ -138,17 +186,15 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_ROW_COMLIST_DATE_STAMP' => $row['com_date']
 			));
 
-			if (((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) || Cot::$usr['id'] == 0) && Cot::$usr['lastvisit'] < $row['com_date']) {
+			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
 				$t->assign('PAGE_ROW_NEW', Cot::$L['New']);
 				$jn++;
 			}
-			else {
+			else
 				$t->assign('PAGE_ROW_NEW', '');
-			}
 
 			/* === Hook - Part 2 === */
-			foreach ($loop_extplugins as $pl)
-			{
+			foreach ($extp as $pl) {
 				include $pl;
 			}
 			/* ===== */
@@ -157,15 +203,13 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 			$jj++;
 		}
 
-		$t->assign('COMMENT_TOP_NEWCOUNT', $jn);
+		$t->assign('COMLIST_NEWCOMMENTS', $jn);
 
+		// Render pagination if needed
 		if (!empty($pagination)) {
 
-			$totalitems = Cot::$db->query("SELECT COUNT(*)
-				FROM ".Cot::$db->com."
-				$sql_cond")->fetchColumn();
+			$totalitems = Cot::$db->query("SELECT COUNT(*) FROM $db_com $sql_cond")->fetchColumn();
 
-			// Render pagination
 			$url_area = defined('COT_PLUG') ? 'plug' : Cot::$env['ext'];
 
 			if (defined('COT_LIST')) {
@@ -180,25 +224,34 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				global $m;
 				$url_params = empty($m) ? array() :  array('m' => $m);
 			}
+			elseif (defined('COT_ADMIN')) {
+				$url_area = 'admin';
+				global $m, $p, $a;
+				$url_params = array('m' => $m, 'p' => $p, 'a' => $a);
+			}
 			else {
 				$url_params = array();
 			}
 
 			$url_params[$pagination] = $durl;
 
-			if (Cot::$cfg['plugin']['comlist']['ajax'] == 1) {
-				$ajax = true;
+			if ((Cot::$cfg['turnajax'] == 1) && (Cot::$cfg['plugin']['comlist']['ajax'] == 1) && !empty($ajax_block)) {
+				$ajax_mode = true;
 				$ajax_plug = 'plug';
-				$ajax_plug_params = "r=comlist&tpl=$tpl&items=$items&order=$order&extra=$extra&group=$group&pagination=$pagination&ajax_block=$ajax_block&cache_name=$cache_name&cache_ttl=$cache_ttl";
+				if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls'] == 1)
+					$ajax_plug_params = "r=comlist&h=$h";
+				else
+					$ajax_plug_params = "r=comlist&tpl=$tpl&items=$items&order=$order&extra=$extra&group=$group&pagination=$pagination&ajax_block=$ajax_block&cache_name=$cache_name&cache_ttl=$cache_ttl";
 			}
 			else {
-				$ajax = false;
-				$ajax_plug = '';
-				$ajax_plug_params = '';
+				$ajax_mode = false;
+				$ajax_plug = $ajax_plug_params = '';
 			}
-			$pagenav = cot_pagenav($url_area, $url_params, $d, $totalitems, $items, $pagination, '', $ajax, $ajax_block, $ajax_plug, $ajax_plug_params);
 
-				$t->assign(array(
+			$pagenav = cot_pagenav($url_area, $url_params, $d, $totalitems, $items, $pagination, '', $ajax_mode, $ajax_block, $ajax_plug, $ajax_plug_params);
+
+			// Assign pagination tags
+			$t->assign(array(
 				'PAGE_TOP_PAGINATION'  => $pagenav['main'],
 				'PAGE_TOP_PAGEPREV'    => $pagenav['prev'],
 				'PAGE_TOP_PAGENEXT'    => $pagenav['next'],
@@ -210,26 +263,21 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_TOP_TOTALPAGES'  => $pagenav['total']
 			));
 		}
-		else {
-			$totalitems = 0;
-		}
+
+		if ($jj==1)
+			$t->parse("MAIN.NONE");
 
 		/* === Hook === */
-		foreach (cot_getextplugins('comlist.tags') as $pl)
-		{
+		foreach (cot_getextplugins('comlist.tags') as $pl) {
 			include $pl;
 		}
 		/* ===== */
 
-		if ($jj==1) {
-			$t->parse("MAIN.NONE");
-		}
-
 		$t->parse();
 		$output = $t->text();
 
-		if (empty($pagination) && (Cot::$cfg['plugin']['comlist']['ajax'] == 0) && !empty($cache_name) && !empty($cache_ttl) && Cot::$cache && $cache_ttl > 0)
-		Cot::$cache->db->store($cache_name, $output, '[SEDBY] cot_comlist', $cache_ttl);
+		if (Cot::$cache && ($jj > 1) && empty($pagination) && !empty($cache_name) && !empty($cache_ttl) && ($cache_ttl > 0))
+		Cot::$cache->db->store($cache_name, $output, SEDBY_COMLIST_REALM, $cache_ttl);
 	}
 	return $output;
 }
