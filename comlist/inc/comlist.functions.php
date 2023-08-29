@@ -116,14 +116,14 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		if (Cot::$cfg['plugin']['comlist']['page'] == 1) {
 			$db_pages = Cot::$db->pages;
 			$comlist_join_columns .= " , p.* ";
-			$comlist_join_tables .= "LEFT JOIN $db_pages AS p ON c.com_code = p.page_id AND c.com_area = 'page'";
+			$comlist_join_tables .= "LEFT JOIN $db_pages AS p ON (c.com_code = p.page_id AND c.com_area = 'page')";
 		}
 
 		// Users Module Support
 		if (Cot::$cfg['plugin']['comlist']['users'] == 1) {
 			$db_users = Cot::$db->users;
 			$comlist_join_columns .= " , u.* ";
-			$comlist_join_tables .= "LEFT JOIN $db_users AS u ON u.user_id = c.com_authorid";
+			$comlist_join_tables .= "LEFT JOIN $db_users AS u ON (u.user_id = c.com_authorid)";
 		}
 
 		/* === Hook === */
@@ -147,7 +147,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 					$cat = Cot::$structure[$row['com_area']][$row['com_code']];
 					$link_params = array('c' => $row['com_code']);
 					$t->assign(array(
-						'PAGE_ROW_CAT_TITLE' => htmlspecialchars($cat['title']) . " (раздел)",
+						'PAGE_ROW_CAT_TITLE' => htmlspecialchars($cat['title']),
 						'PAGE_ROW_CAT_URL' => cot_url('page', $link_params),
 					));
 				}
