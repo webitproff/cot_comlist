@@ -95,7 +95,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		$sql_order = empty($order) ? "" : "ORDER BY $order";
 
 		// Compile group
-		$sql_group = ($group == 1) ? "c.com_id = (SELECT MAX(com_id) FROM " .$db_com . " AS c2 WHERE c2.com_code = c.com_code)" : '';
+		$sql_group = ($group == 1) ? "c.com_id = (SELECT MAX(com_id) FROM " . $db_com . " AS c2 WHERE c2.com_code = c.com_code)" : '';
 
 		// Compile extra SQL condition
 		$sql_extra = (empty($extra)) ? "" : $extra;
@@ -153,9 +153,9 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				}
 				else {
 					// Page comments
-					$t->assign(cot_generate_pagetags($row, 'PAGE_ROW_'));
 					$link_params = array('c' => $row['page_cat']);
 					empty($row['page_alias']) ? $link_params['id'] = $row['page_id'] : $link_params['al'] = $row['page_alias'];
+          $t->assign(cot_generate_pagetags($row, 'PAGE_ROW_PAGE_'));
 				}
 			}
 
@@ -165,25 +165,25 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 			$com_text = cot_parse($row['com_text'], Cot::$cfg['plugin']['comments']['markup']);
 
 			$t->assign(array(
-				'PAGE_ROW_COMLIST_NUM' => $jj,
-				'PAGE_ROW_COMLIST_ODDEVEN' => cot_build_oddeven($jj),
+				'PAGE_ROW_NUM' => $jj,
+				'PAGE_ROW_ODDEVEN' => cot_build_oddeven($jj),
 
-				'PAGE_ROW_COMLIST_CODE_IS_NUMERIC' => is_numeric($row['com_code']) ? TRUE : FALSE,
+				'PAGE_ROW_CODE_IS_NUMERIC' => is_numeric($row['com_code']) ? TRUE : FALSE,
 
-				'PAGE_ROW_COMLIST_ID' => $row['com_id'],
-				'PAGE_ROW_COMLIST_CODE' => $row['com_code'],
-				'PAGE_ROW_COMLIST_AREA' => $row['com_area'],
+				'PAGE_ROW_ID' => $row['com_id'],
+				'PAGE_ROW_CODE' => $row['com_code'],
+				'PAGE_ROW_AREA' => $row['com_area'],
 
-				'PAGE_ROW_COMLIST_AUTHORNAME' => htmlspecialchars($row['com_author']),
-				'PAGE_ROW_COMLIST_AUTHORID' => $row['com_authorid'],
-				'PAGE_ROW_COMLIST_AUTHORIP' => $row['com_authorip'],
-				'PAGE_ROW_COMLIST_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
+				'PAGE_ROW_AUTHORNAME' => htmlspecialchars($row['com_author']),
+				'PAGE_ROW_AUTHORID' => $row['com_authorid'],
+				'PAGE_ROW_AUTHORIP' => $row['com_authorip'],
+				'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
 
-				'PAGE_ROW_COMLIST_TEXT' => $com_text,
-				'PAGE_ROW_COMLIST_TEXT_PLAIN' => strip_tags($com_text),
+				'PAGE_ROW_TEXT' => $com_text,
+				'PAGE_ROW_TEXT_PLAIN' => strip_tags($com_text),
 
-				'PAGE_ROW_COMLIST_DATE' => cot_date('datetime_medium', $row['com_date']),
-				'PAGE_ROW_COMLIST_DATE_STAMP' => $row['com_date']
+				'PAGE_ROW_DATE' => cot_date('datetime_medium', $row['com_date']),
+				'PAGE_ROW_DATE_STAMP' => $row['com_date']
 			));
 
 			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
