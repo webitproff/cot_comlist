@@ -160,7 +160,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 			}
 
 			if (Cot::$cfg['plugin']['comlist']['users'] == 1)
-				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_AUTHOR_'));
+				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_USER_'));
 
 			$com_text = cot_parse($row['com_text'], Cot::$cfg['plugin']['comments']['markup']);
 
@@ -177,7 +177,6 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_ROW_AUTHORNAME' => htmlspecialchars($row['com_author']),
 				'PAGE_ROW_AUTHORID' => $row['com_authorid'],
 				'PAGE_ROW_AUTHORIP' => $row['com_authorip'],
-				'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
 
 				'PAGE_ROW_TEXT' => $com_text,
 				'PAGE_ROW_TEXT_PLAIN' => strip_tags($com_text),
@@ -185,6 +184,21 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_ROW_DATE' => cot_date('datetime_medium', $row['com_date']),
 				'PAGE_ROW_DATE_STAMP' => $row['com_date']
 			));
+
+      if ($row['com_authorid'] > 0) {
+        $avatar_link = (Cot::$cfg['plugin']['comlist']['users'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
+        $t->assign(array(
+          'PAGE_ROW_AVATAR' => '<img src="' . $avatar_link . '" class="userimg avatar" alt="" />',
+          'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
+        ));
+      }
+      else {
+        require_once cot_incfile('comlist', 'plug', 'rc');
+        $t->assign(array(
+          'PAGE_ROW_AVATAR' => cot_rc('comlist_default_avatar'),
+          'PAGE_ROW_AUTHOR' => htmlspecialchars($row['com_author']),
+        ));
+      }
 
 			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
 				$t->assign('PAGE_ROW_NEW', Cot::$L['New']);

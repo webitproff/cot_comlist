@@ -1,7 +1,7 @@
 <!-- BEGIN: MAIN -->
 	<ul class="list-unstyled comlist">
 <!-- BEGIN: PAGE_ROW -->
-		<li class="{PAGE_ROW_ODDEVEN} overflow-hidden">
+		<li class="{PAGE_ROW_COMLIST_ODDEVEN} overflow-hidden">
 
 			<figure class="mb-0">
 <!-- IF {PAGE_ROW_AUTHOR_AVATAR} -->
@@ -12,11 +12,11 @@
 			</figure>
 
 			<div class="text">
-				{PAGE_ROW_TEXT_PLAIN}
+				{PAGE_ROW_COMLIST_TEXT_PLAIN}
 			</div>
 
 			<p>
-				{PAGE_COMLIST_AUTHORNAME} / {PAGE_ROW_DATE}
+				{PAGE_ROW_COMLIST_AUTHORNAME} / {PAGE_ROW_COMLIST_DATE}
 			</p>
 
 		</li>

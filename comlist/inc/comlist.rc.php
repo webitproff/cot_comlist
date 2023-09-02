@@ -1,12 +1,12 @@
-<?php
+<?
 /* ====================
 [BEGIN_COT_EXT]
-Hooks=global
+Hooks=rc
 [END_COT_EXT]
 ==================== */
 
 /**
-* Comlist Plugin / Global
+* Comlist Plugin / Resources (pagination)
 *
 * @package comlist
 * @author Dmitri Beliavski
@@ -15,5 +15,5 @@ Hooks=global
 
 defined('COT_CODE') or die('Wrong URL');
 
-require_once cot_incfile('comlist', 'plug', 'rc');
-require_once cot_incfile('comlist', 'plug');
+// Redefine Default Avatar
+$R['comlist_default_avatar'] = '<img src="datas/defaultav/default.png" alt="'.$L['Avatar'].'" class="avatar" />';
