@@ -17,3 +17,4 @@ defined('COT_CODE') or die('Wrong URL');
 
 require_once cot_incfile('comlist', 'plug', 'rc');
 require_once cot_incfile('comlist', 'plug');
+

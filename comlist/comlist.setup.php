@@ -5,7 +5,7 @@ Code=comlist
 Name=[SEDBY] Comlist
 Category=navigation-structure
 Description=A widget displaying comments from any template of your site
-Version=2.00b
+Version=1.30b
 Date=2023-06-20
 Author=Dmitri Beliavski
 Copyright=&copy; 2012-2023 Seditio.By
@@ -26,8 +26,8 @@ encrypt_key=03:string::1234567890123456:Secret Key
 encrypt_iv=04:string::1234567890123456:Initialization Vector
 
 gentags=20:separator:::
-page=21:radio::0:Generate Page tags
-users=22:radio::0:Generate User tags
+pagetags=21:radio::0:Generate Page tags
+usertags=22:radio::0:Generate User tags
 
 [END_COT_EXT_CONFIG]
 ==================== */

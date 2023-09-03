@@ -6,7 +6,7 @@ Hooks=rc
 ==================== */
 
 /**
-* Comlist Plugin / Resources (pagination)
+* Comlist Plugin / Resources (misc)
 *
 * @package comlist
 * @author Dmitri Beliavski
@@ -15,5 +15,6 @@ Hooks=rc
 
 defined('COT_CODE') or die('Wrong URL');
 
-// Redefine Default Avatar
-$R['comlist_default_avatar'] = '<img src="datas/defaultav/default.png" alt="'.$L['Avatar'].'" class="avatar" />';
+// Redefine Avatars
+$R['comlist_avatar'] = '<img src="{$src}" alt="{$user}" class="{$class}" />';
+$R['comlist_default_avatar'] = '<img src="datas/defaultav/default.png" alt="'.$L['Avatar'].'" class="avatar img-fluid" />';

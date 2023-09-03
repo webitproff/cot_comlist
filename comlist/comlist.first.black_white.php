@@ -5,6 +5,14 @@ Hooks=comlist.first
 [END_COT_EXT]
 ==================== */
 
+/**
+* Comlist Plugin / Black & White Lists Support (requires Pagelist plugin)
+*
+* @package comlist
+* @author Dmitri Beliavski
+* @copyright (c) 2023 seditio.by
+*/
+
 defined('COT_CODE') or die('Wrong URL');
 
 if (strpos($extra, ';')) {

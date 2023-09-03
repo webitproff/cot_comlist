@@ -14,6 +14,7 @@ define('SEDBY_COMLIST_REALM', '[SEDBY] Comlist');
 
 require_once cot_incfile('comments', 'plug');
 require_once cot_incfile('page', 'module');
+require_once cot_incfile('comlist', 'plug', 'rc');
 
 /**
  * Encrypts or decrypts string
@@ -113,14 +114,14 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		$comlist_join_tables = "";
 
 		// Page Module Support
-		if (Cot::$cfg['plugin']['comlist']['page'] == 1) {
+		if (Cot::$cfg['plugin']['comlist']['pagetags'] == 1) {
 			$db_pages = Cot::$db->pages;
 			$comlist_join_columns .= " , p.* ";
 			$comlist_join_tables .= "LEFT JOIN $db_pages AS p ON (c.com_code = p.page_id AND c.com_area = 'page')";
 		}
 
 		// Users Module Support
-		if (Cot::$cfg['plugin']['comlist']['users'] == 1) {
+		if (Cot::$cfg['plugin']['comlist']['usertags'] == 1) {
 			$db_users = Cot::$db->users;
 			$comlist_join_columns .= " , u.* ";
 			$comlist_join_tables .= "LEFT JOIN $db_users AS u ON (u.user_id = c.com_authorid)";
@@ -141,7 +142,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		/* ===== */
 
 		while ($row = $res->fetch()) {
-			if (Cot::$cfg['plugin']['comlist']['page'] == 1 && $row['com_area'] == 'page') {
+			if (Cot::$cfg['plugin']['comlist']['pagetags'] == 1 && $row['com_area'] == 'page') {
 				if (empty($row['page_id']) && isset(Cot::$structure[$row['com_area']][$row['com_code']])) {
 					// Category comments
 					$cat = Cot::$structure[$row['com_area']][$row['com_code']];
@@ -159,9 +160,10 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				}
 			}
 
-			if (Cot::$cfg['plugin']['comlist']['users'] == 1)
+			if (Cot::$cfg['plugin']['comlist']['usertags'] == 1)
 				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_USER_'));
 
+      $com_author = htmlspecialchars($row['com_author']);
 			$com_text = cot_parse($row['com_text'], Cot::$cfg['plugin']['comments']['markup']);
 
 			$t->assign(array(
@@ -174,7 +176,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_ROW_CODE' => $row['com_code'],
 				'PAGE_ROW_AREA' => $row['com_area'],
 
-				'PAGE_ROW_AUTHORNAME' => htmlspecialchars($row['com_author']),
+				'PAGE_ROW_AUTHORNAME' => $com_author,
 				'PAGE_ROW_AUTHORID' => $row['com_authorid'],
 				'PAGE_ROW_AUTHORIP' => $row['com_authorip'],
 
@@ -186,17 +188,17 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 			));
 
       if ($row['com_authorid'] > 0) {
-        $avatar_link = (Cot::$cfg['plugin']['comlist']['users'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
+        $avatar_link = (Cot::$cfg['plugin']['comlist']['usertags'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
         $t->assign(array(
-          'PAGE_ROW_AVATAR' => '<img src="' . $avatar_link . '" class="userimg avatar" alt="" />',
-          'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], htmlspecialchars($row['com_author'])),
+          'PAGE_ROW_AVATAR' => (empty($avatar_link)) ? cot_rc('comlist_default_avatar') : cot_rc('comlist_avatar', array('src' => $avatar_link, 'user' => $com_author, 'class' => 'img-fluid')),
+          'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], $com_author),
         ));
       }
       else {
         require_once cot_incfile('comlist', 'plug', 'rc');
         $t->assign(array(
           'PAGE_ROW_AVATAR' => cot_rc('comlist_default_avatar'),
-          'PAGE_ROW_AUTHOR' => htmlspecialchars($row['com_author']),
+          'PAGE_ROW_AUTHOR' => $com_author,
         ));
       }
 
@@ -222,7 +224,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		// Render pagination if needed
 		if (!empty($pagination)) {
 
-			$totalitems = Cot::$db->query("SELECT COUNT(*) FROM $db_com $sql_cond")->fetchColumn();
+			$totalitems = Cot::$db->query("SELECT c.* FROM $db_com AS c $sql_cond")->rowCount();
 
 			$url_area = defined('COT_PLUG') ? 'plug' : Cot::$env['ext'];
 
@@ -243,9 +245,8 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				global $m, $p, $a;
 				$url_params = array('m' => $m, 'p' => $p, 'a' => $a);
 			}
-			else {
+			else
 				$url_params = array();
-			}
 
 			$url_params[$pagination] = $durl;
 
@@ -277,6 +278,14 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				'PAGE_TOP_TOTALPAGES'  => $pagenav['total']
 			));
 		}
+
+    // Assign service tags
+    if (!empty($cache_name) && (Cot::$usr['maingrp'] == 5)) {
+      $t->assign(array(
+        'PAGE_TOP_QUERY' => $query,
+        'PAGE_TOP_RES' => $res,
+      ));
+    }
 
 		if ($jj==1)
 			$t->parse("MAIN.NONE");
