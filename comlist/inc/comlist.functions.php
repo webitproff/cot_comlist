@@ -48,17 +48,18 @@ require_once cot_incfile('comlist', 'plug', 'rc');
  * Generates comment list widget
  *
  * @param  string  $tpl					01. Template code
- * @param  integer $items				02. Number of items to show. 0 - show all items
+ * @param  int     $items				02. Number of items to show. 0 - show all items
  * @param  string  $order				03. Sorting order (SQL)
  * @param  string  $extra				04. Custom selection filter (SQL)
- * @param  integer $group				05. Group comments by code
- * @param  string  $pagination	06. Pagination parameter name for the URL, e.g. 'pcm'. Make sure it does not conflict with other paginations. Leave it empty to turn off pagination
- * @param  string  $ajax_block	07. DOM block ID for ajax pagination
- * @param  integer $cache_name	08. Cache name
- * @param  integer $cache_ttl		09. Cache TTL
+ * @param  int     $group				05. Group comments by code
+ * @param  int     $offset			06. Exclude specified number of records starting from the beginning
+ * @param  string  $pagination	07. Pagination parameter name for the URL, e.g. 'pcm'. Make sure it does not conflict with other paginations. Leave it empty to turn off pagination
+ * @param  string  $ajax_block	08. DOM block ID for ajax pagination
+ * @param  string  $cache_name	09. Cache name
+ * @param  int     $cache_ttl		10. Cache TTL
  * @return string								Parsed HTML
  */
-function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $group = 0, $pagination = '', $ajax_block = '', $cache_name = '', $cache_ttl = '') {
+function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $group = 0, $offset = 0, $pagination = '', $ajax_block = '', $cache_name = '', $cache_ttl = '') {
 
 	$cache_name = (!empty($cache_name)) ? str_replace(' ', '_', $cache_name) : '';
 
@@ -73,7 +74,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		/* ===== */
 
 		if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls']) {
-			$h = $tpl.','.$items.','.$order.','.$extra.','.$group.','.$pagination.','.$ajax_block.','.$cache_name.','.$cache_ttl;
+			$h = $tpl.','.$items.','.$order.','.$extra.','.$group.','.$offset.','.$pagination.','.$ajax_block.','.$cache_name.','.$cache_ttl;
 			$h = cot_encrypt_decrypt('encrypt', $h, Cot::$cfg['plugin']['comlist']['encrypt_key'], Cot::$cfg['plugin']['comlist']['encrypt_iv']);
 			$h = str_replace('=', '', $h);
 		}
@@ -90,6 +91,8 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 			$d = 0;
 
 		// Compile items number
+    (!ctype_digit($offset)) && $offset = 0;
+    $d = $d + $offset;
 		$sql_limit = ($items > 0) ? "LIMIT $d, $items" : "";
 
 		// Compile order
@@ -256,7 +259,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 				if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls'] == 1)
 					$ajax_plug_params = "r=comlist&h=$h";
 				else
-					$ajax_plug_params = "r=comlist&tpl=$tpl&items=$items&order=$order&extra=$extra&group=$group&pagination=$pagination&ajax_block=$ajax_block&cache_name=$cache_name&cache_ttl=$cache_ttl";
+					$ajax_plug_params = "r=comlist&tpl=$tpl&items=$items&order=$order&extra=$extra&group=$group&offset=$offset&pagination=$pagination&ajax_block=$ajax_block&cache_name=$cache_name&cache_ttl=$cache_ttl";
 			}
 			else {
 				$ajax_mode = false;
