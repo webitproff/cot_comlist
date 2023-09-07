@@ -2,7 +2,7 @@
 <ul class="list-unstyled comments">
 <!-- BEGIN: PAGE_ROW -->
 	<li class="{PAGE_ROW_ODDEVEN} px-3 py-2">
-		<figure class="me-3 mb-0 float-start">
+		<figure class="me-3 mb-1 float-start">
 			{PAGE_ROW_AVATAR}
 		</figure>
 

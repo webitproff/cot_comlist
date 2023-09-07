@@ -16,5 +16,5 @@ Hooks=rc
 defined('COT_CODE') or die('Wrong URL');
 
 // Redefine Avatars
-$R['comlist_avatar'] = '<img src="{$src}" alt="{$user}" class="{$class}" />';
+$R['comlist_avatar'] = '<img src="{$src}" alt="{$user}" class="img-fluid" />';
 $R['comlist_default_avatar'] = '<img src="datas/defaultav/default.png" alt="'.$L['Avatar'].'" class="avatar img-fluid" />';
