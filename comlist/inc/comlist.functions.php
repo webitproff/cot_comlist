@@ -59,12 +59,7 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
     if (!empty($pagination) && ((int)$items > 0))
       $enablePagination = true;
 
-		if ($enableAjax && Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls']) {
-			$h = $tpl . ',' . $items . ',' . $order . ',' . $extra . ',' . $group . ',' . $offset . ',' . $pagination . ',' . $ajax_block . ',' . $cache_name . ',' . $cache_ttl;
-			$h = cot_encrypt_decrypt('encrypt', $h, Cot::$cfg['plugin']['comlist']['encrypt_key'], Cot::$cfg['plugin']['comlist']['encrypt_iv']);
-			$h = str_replace('=', '', $h);
-		}
-
+		// DB tables shortcuts
 		$db_com = Cot::$db->com;
 
 		// Display the items
@@ -216,33 +211,25 @@ function cot_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $gr
 		if ($enablePagination) {
 			$totalitems = Cot::$db->query("SELECT c.* FROM $db_com AS c $sql_cond")->rowCount();
 
-			$url_area = defined('COT_PLUG') ? 'plug' : Cot::$env['ext'];
-			if (defined('COT_LIST')) {
-				global $list_url_path;
-				$url_params = $list_url_path;
-			}
-			elseif (defined('COT_PAGES')) {
-				global $al, $id, $pag;
-				$url_params = empty($al) ? array('c' => $pag['page_cat'], 'id' => $id) :  array('c' => $pag['page_cat'], 'al' => $al);
-			}
-			elseif(defined('COT_USERS')) {
-				global $m;
-				$url_params = empty($m) ? array() :  array('m' => $m);
-			}
-			elseif (defined('COT_ADMIN')) {
+			if (defined('COT_ADMIN'))
 				$url_area = 'admin';
-				global $m, $p, $a;
-				$url_params = array('m' => $m, 'p' => $p, 'a' => $a);
-			}
+			elseif (defined('COT_PLUG'))
+				$url_area = 'plug';
 			else
-				$url_params = array();
+				$url_area = Cot::$env['ext'];
+
+			$url_params = cot_geturlparams();
 			$url_params[$pagination] = $durl;
 
 			if ($enableAjax) {
 				$ajax_mode = true;
 				$ajax_plug = 'plug';
-				if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls'])
+				if (Cot::$cfg['plugin']['comlist']['encrypt_ajax_urls']) {
+					$h = $tpl . ',' . $items . ',' . $order . ',' . $extra . ',' . $group . ',' . $offset . ',' . $pagination . ',' . $ajax_block . ',' . $cache_name . ',' . $cache_ttl;
+					$h = cot_encrypt_decrypt('encrypt', $h, Cot::$cfg['plugin']['comlist']['encrypt_key'], Cot::$cfg['plugin']['comlist']['encrypt_iv']);
+					$h = str_replace('=', '', $h);
 					$ajax_plug_params = "r=comlist&h=$h";
+				}
 				else
 					$ajax_plug_params = "r=comlist&tpl=$tpl&items=$items&order=$order&extra=$extra&group=$group&offset=$offset&pagination=$pagination&ajax_block=$ajax_block&cache_name=$cache_name&cache_ttl=$cache_ttl";
 			}
