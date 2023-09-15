@@ -19,6 +19,6 @@ require_once cot_incfile('pagelist', 'plug');
 
 if ($bw_mode) {
   $bw_cats = explode(';', $bw_cats);
-  $bw_cond = cot_compilecats($bw_mode, $bw_cats, $bw_subs);
-  $comlist_join_tables = " JOIN cot_pages ON (com_area='page' AND com_code=page_id) WHERE " . $bw_cond;
+  $bw_cond = sedby_compilecats($bw_mode, $bw_cats, $bw_subs);
+  $sql_cond = empty($sql_cond) ? " WHERE " . $bw_cond : $sql_cond . " AND " . $bw_cond;
 }

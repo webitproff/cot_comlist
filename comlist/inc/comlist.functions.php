@@ -14,7 +14,6 @@ define('SEDBY_COMLIST_REALM', '[SEDBY] Comlist');
 
 require_once cot_incfile('comments', 'plug');
 require_once cot_incfile('page', 'module');
-require_once cot_incfile('comlist', 'plug', 'rc');
 require_once cot_incfile('pagelist', 'plug', 'functions.extra');
 
 /**
@@ -82,7 +81,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		$sql_limit = ($items > 0) ? "LIMIT $d, $items" : "";
 
 		// Compile order
-		$sql_order = empty($order) ? "" : " ORDER BY $order";
+		$sql_order = empty($order) ? "ORDER BY com_id DESC" : " ORDER BY $order";
 
 		// Compile group
 		$sql_group = ($group == 1) ? "c.com_id = (SELECT MAX(com_id) FROM " . $db_com . " AS c2 WHERE c2.com_code = c.com_code)" : "";
@@ -170,19 +169,20 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 				'PAGE_ROW_DATE_STAMP' => $row['com_date']
 			));
 
-      if ($row['com_authorid'] > 0) {
-        $avatar_link = (Cot::$cfg['plugin']['comlist']['usertags'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
-        $t->assign(array(
-          'PAGE_ROW_AVATAR' => (empty($avatar_link)) ? cot_rc('comlist_default_avatar') : cot_rc('comlist_avatar', array('src' => $avatar_link, 'user' => $com_author)),
-          'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], $com_author),
-        ));
-      } else {
-        require_once cot_incfile('comlist', 'plug', 'rc');
-        $t->assign(array(
-          'PAGE_ROW_AVATAR' => cot_rc('comlist_default_avatar'),
-          'PAGE_ROW_AUTHOR' => $com_author,
-        ));
-      }
+			// Can now be donw with customavatar plugin & usertags option
+      // if ($row['com_authorid'] > 0) {
+      //   $avatar_link = (Cot::$cfg['plugin']['comlist']['usertags'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
+      //   $t->assign(array(
+      //     'PAGE_ROW_AVATAR' => (empty($avatar_link)) ? cot_rc('comlist_default_avatar') : cot_rc('comlist_avatar', array('src' => $avatar_link, 'user' => $com_author)),
+      //     'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], $com_author),
+      //   ));
+      // } else {
+      //   require_once cot_incfile('comlist', 'plug', 'rc');
+      //   $t->assign(array(
+      //     'PAGE_ROW_AVATAR' => cot_rc('comlist_default_avatar'),
+      //     'PAGE_ROW_AUTHOR' => $com_author,
+      //   ));
+      // }
 
 			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
 				$t->assign('PAGE_ROW_NEW', Cot::$L['New']);
@@ -200,6 +200,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 			$t->parse("MAIN.PAGE_ROW");
 			$jj++;
 		}
+		unset($jj);
 
 		$t->assign('COMLIST_NEWCOMMENTS', $jn);
 
