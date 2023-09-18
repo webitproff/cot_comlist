@@ -29,8 +29,8 @@ $L['info_desc'] = 'Function to build Comments Plugin widgets';
  $L['cfg_encrypt_iv'] = 'Initialization vector';
 
 $L['cfg_gentags'] = 'Generate tags:';
-$L['cfg_page'] = 'Create tags for the Page Module';
-$L['cfg_users'] = 'Create tags for the Users Module';
+$L['cfg_pagetags'] = 'Create tags for the Page Module';
+$L['cfg_usertags'] = 'Create tags for the Users Module';
 
 /**
  * Plugin Tools

@@ -20,5 +20,4 @@ if (strpos($extra, ';')) {
   $bw_cats = substr($extra, 2);
   $bw_subs = substr($extra, 1, 1);
   $extra = '';
-  // echo $bw_mode . ' ' . $bw_cats . ' ' . $bw_subs;
 }

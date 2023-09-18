@@ -36,7 +36,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 	$enableAjax = $enableCache = $enablePagination = false;
 
   // Condition shortcut
-  if (Cot::$cache && !empty($cache_name) && ((int)$cache_ttl > 0)) {
+  if (Cot::$cache && !empty($cache_name) && ((int)$cache_ttl > 0) && (Cot::$usr['id'] == 0)) {
     $enableCache = true;
     $cache_name = str_replace(' ', '_', $cache_name);
   }
@@ -46,8 +46,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 	} else {
 
 		/* === Hook === */
-		foreach (cot_getextplugins('comlist.first') as $pl)
-		{
+		foreach (cot_getextplugins('comlist.first') as $pl) {
 			include $pl;
 		}
 		/* ===== */
@@ -109,8 +108,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		}
 
 		/* === Hook === */
-		foreach (cot_getextplugins('comlist.query') as $pl)
-		{
+		foreach (cot_getextplugins('comlist.query') as $pl) {
 			include $pl;
 		}
 		/* ===== */
@@ -169,21 +167,6 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 				'PAGE_ROW_DATE_STAMP' => $row['com_date']
 			));
 
-			// Can now be donw with customavatar plugin & usertags option
-      // if ($row['com_authorid'] > 0) {
-      //   $avatar_link = (Cot::$cfg['plugin']['comlist']['usertags'] == 1) ? $row['user_avatar'] : Cot::$db->query("SELECT user_avatar FROM " . Cot::$db->users . " WHERE user_id = ?", $row['com_authorid'])->fetchColumn();
-      //   $t->assign(array(
-      //     'PAGE_ROW_AVATAR' => (empty($avatar_link)) ? cot_rc('comlist_default_avatar') : cot_rc('comlist_avatar', array('src' => $avatar_link, 'user' => $com_author)),
-      //     'PAGE_ROW_AUTHOR' => cot_build_user($row['com_authorid'], $com_author),
-      //   ));
-      // } else {
-      //   require_once cot_incfile('comlist', 'plug', 'rc');
-      //   $t->assign(array(
-      //     'PAGE_ROW_AVATAR' => cot_rc('comlist_default_avatar'),
-      //     'PAGE_ROW_AUTHOR' => $com_author,
-      //   ));
-      // }
-
 			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
 				$t->assign('PAGE_ROW_NEW', Cot::$L['New']);
 				$jn++;
@@ -200,7 +183,6 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 			$t->parse("MAIN.PAGE_ROW");
 			$jj++;
 		}
-		unset($jj);
 
 		$t->assign('COMLIST_NEWCOMMENTS', $jn);
 
@@ -255,8 +237,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		($jj==1) && $t->parse("MAIN.NONE");
 
 		/* === Hook === */
-		foreach (cot_getextplugins('comlist.tags') as $pl)
-		{
+		foreach (cot_getextplugins('comlist.tags') as $pl) {
 			include $pl;
 		}
 		/* ===== */
@@ -264,7 +245,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		$t->parse();
 		$output = $t->text();
 
-		if (($jj > 1) && $enableCache && !$enablePagination) {
+		if ($enableCache && !$enablePagination && ($jj > 1)) {
 			Cot::$cache->db->store($cache_name, $output, SEDBY_COMLIST_REALM, $cache_ttl);
 		}
 	}
