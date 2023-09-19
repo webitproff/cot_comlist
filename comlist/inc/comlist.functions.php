@@ -172,6 +172,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 				$jn++;
 			} else {
 				$t->assign('PAGE_ROW_NEW', '');
+				$jn = 0;
 			}
 
 			/* === Hook - Part 2 === */
@@ -184,7 +185,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 			$jj++;
 		}
 
-		$t->assign('COMLIST_NEWCOMMENTS', $jn);
+		$t->assign('PAGE_TOP_NEW_COMMENTS', $jn);
 
 		// Render pagination if needed
 		if ($enablePagination) {
