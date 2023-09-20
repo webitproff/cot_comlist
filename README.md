@@ -4,16 +4,16 @@
 ## Использование:
 
 ```html
-{PHP|cot_comlist($tpl = 'comlist', $items = 0, $order = '', $area = '', $extra = '', $group = 0, $pagination = '', $ajax_block = 'comlist', $cache_name = '', $cache_ttl = 86400)}
+{PHP|cot_comlist($tpl, $items, $order, $extra, $group, $offset, $pagination, $ajax_block, $cache_name, $cache_ttl)}
 ```
 
 Назначение параметров:
 * $tpl -- имя шаблона (по умолчанию comlist)
-* $items -- количество выводимых записей (0 -- вывести все)
+* $items -- количество выводимых записей (по умолчанию 0 -- вывести все)
 * $order -- сортировка (по умолчанию "com_date DESC")
-* $area -- имя расширения (по умолчанию все)
 * $extra -- дополнительное MYSQL-условие
 * $group -- сгруппировать по страницам
+* $offset -- сдвиг на указанное количество записей от первой
 * $pagination -- код паджинации
 * $ajax_block -- ajax-блок (id), по умолчанию comlist
 * $cache_name -- имя записи кэша
@@ -21,8 +21,8 @@
 
 ## В шаблоне генерятся следующие теги:
 
-* {PAGE_ROW_COMLIST_NUM} -- порядковый номер
-* {PAGE_ROW_COMLIST_ODDEVEN} -- класс odd/even
+* {PAGE_ROW_NUM} -- порядковый номер
+* {PAGE_ROW_ODDEVEN} -- класс odd/even (чет/нечет)
 * {PAGE_ROW_COMLIST_IS_NUMERIC} -- цифровой (не символьный) код 'com_code'
 * {PAGE_ROW_COMLIST_ID} -- id комментария
 * {PAGE_ROW_COMLIST_CODE} -- код комментария

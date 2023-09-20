@@ -1,4 +1,4 @@
-<?
+<?php
 /* ====================
 [BEGIN_COT_EXT]
 Hooks=rc
