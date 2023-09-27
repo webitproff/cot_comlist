@@ -88,7 +88,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		// Compile extra SQL condition
 		$sql_extra = (empty($extra)) ? "" : $extra;
 
-		$sql_cond = sedby_twocond($sql_group, $sql_extra);
+		$sql_cond = sedby_build_where(array($sql_group, $sql_extra));
 
 		$comlist_join_columns = "";
 		$comlist_join_tables = "";
@@ -164,7 +164,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 				'PAGE_ROW_TEXT_PLAIN' => strip_tags($com_text),
 
 				'PAGE_ROW_DATE' => cot_date('datetime_medium', $row['com_date']),
-				'PAGE_ROW_DATE_STAMP' => $row['com_date']
+				'PAGE_ROW_DATE_STAMP' => $row['com_date'],
 			));
 
 			if ((Cot::$usr['id'] > 0 && $row['com_authorid'] != Cot::$usr['id']) && (Cot::$usr['lastvisit'] < $row['com_date'])) {
