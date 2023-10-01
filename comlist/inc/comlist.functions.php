@@ -14,7 +14,7 @@ define('SEDBY_COMLIST_REALM', '[SEDBY] Comlist');
 
 require_once cot_incfile('comments', 'plug');
 require_once cot_incfile('page', 'module');
-require_once cot_incfile('pagelist', 'plug', 'functions.extra');
+require_once cot_incfile('cotlib', 'plug');
 
 /**
  * Generates comment list widget
