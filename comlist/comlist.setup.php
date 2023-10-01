@@ -14,9 +14,9 @@ Auth_guests=R
 Lock_guests=12345A
 Auth_members=R
 Lock_members=12345A
-Requires_modules=page,users
+Requires_modules=users
 Requires_plugins=cotlib,comments
-Recommends_modules=
+Recommends_modules=page,polls
 Recommends_plugins=
 [END_COT_EXT]
 [BEGIN_COT_EXT_CONFIG]
