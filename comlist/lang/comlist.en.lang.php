@@ -31,6 +31,7 @@ $L['info_desc'] = 'Function to build Comments Plugin widgets';
 $L['cfg_gentags'] = 'Generate tags:';
 $L['cfg_pagetags'] = 'Create tags for the Page Module';
 $L['cfg_usertags'] = 'Create tags for the Users Module';
+$L['cfg_thanks'] = 'Create tags for the Thanks Plugin';
 
 /**
  * Plugin Tools

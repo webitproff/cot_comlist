@@ -30,6 +30,7 @@ encrypt_iv=04:string::1234567890123456:Initialization Vector
 gentags=20:separator:::
 pagetags=21:radio::0:Generate Page tags
 usertags=22:radio::0:Generate User tags
+thanks=23:radio::0:Generate Thanks plugin tags
 
 [END_COT_EXT_CONFIG]
 ==================== */
