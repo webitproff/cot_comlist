@@ -8,7 +8,7 @@
 
 <!-- IF {PAGE_ROW_AREA} == 'page' -->
 <!-- IF {PAGE_ROW_CODE_IS_NUMERIC} -->
-		<a href="{PAGE_ROW_PAGE_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_PAGE_SHORTTITLE} // {PAGE_ROW_THANKS_COUNT}</a>
+		<a href="{PAGE_ROW_PAGE_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_PAGE_SHORTTITLE}</a>
 <!-- ELSE -->
 		<a href="{PAGE_ROW_CAT_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_CAT_TITLE}</a>
 <!-- ENDIF -->

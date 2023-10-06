@@ -116,6 +116,7 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 		$query = "SELECT c.* $comlist_join_columns FROM $db_com AS c $comlist_join_tables $sql_cond $sql_order $sql_limit";
 		$res = Cot::$db->query($query);
 		$jj = 1;
+		$jn= 0;
 
 		/* === Hook - Part 1 === */
 		$extp = cot_getextplugins('comlist.loop');
