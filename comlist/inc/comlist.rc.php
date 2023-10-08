@@ -1,12 +1,12 @@
 <?php
 /* ====================
 [BEGIN_COT_EXT]
-Hooks=comments.send.new,comments.delete
+Hooks=rc
 [END_COT_EXT]
 ==================== */
 
 /**
-* Comlist Plugin / Comment add/delete action
+* Comlist Plugin / Resources (misc)
 *
 * @package comlist
 * @author Dmitri Beliavski
@@ -14,5 +14,3 @@ Hooks=comments.send.new,comments.delete
 */
 
 defined('COT_CODE') or die('Wrong URL');
-
-Cot::$cache && Cot::$cache->clear_realm(SEDBY_COMLIST_REALM, COT_CACHE_TYPE_ALL);
