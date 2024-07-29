@@ -1,21 +1,21 @@
 <!-- BEGIN: MAIN -->
 <ul class="list-unstyled comments">
 <!-- BEGIN: PAGE_ROW -->
-	<li class="{PAGE_ROW_ODDEVEN} px-3 py-2">
+	<li class="{PAGE_ROW_ODDEVEN} px-3 py-2 overflow-hidden">
 		<figure class="me-3 mb-1 float-start">
 			{PAGE_ROW_USER_AVATAR}
 		</figure>
 
 <!-- IF {PAGE_ROW_AREA} == 'page' -->
 <!-- IF {PAGE_ROW_CODE_IS_NUMERIC} -->
-		<a href="{PAGE_ROW_PAGE_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_PAGE_SHORTTITLE}</a>
+		<a href="{PAGE_ROW_PAGE_URL}#c{PAGE_ROW_ID}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_PAGE_SHORTTITLE}</a>
 <!-- ELSE -->
-		<a href="{PAGE_ROW_CAT_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_CAT_TITLE}</a>
+		<a href="{PAGE_ROW_CAT_URL}#c{PAGE_ROW_ID}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_CAT_TITLE}</a>
 <!-- ENDIF -->
 <!-- ENDIF -->
 
 <!-- IF {PAGE_ROW_AREA} == 'polls' -->
-		<a href="{PAGE_ROW_POLL_URL}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_POLL_TITLE}</a>
+		<a href="{PAGE_ROW_POLL_URL}#c{PAGE_ROW_ID}" class="lh-1 fw-bold mb-1 d-block">{PAGE_ROW_POLL_TITLE}</a>
 <!-- ENDIF -->
 
 		<div class="text small lh-sm mb-2">

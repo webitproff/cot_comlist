@@ -140,8 +140,8 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 				}
 			}
 
-			if (Cot::$cfg['plugin']['comlist']['usertags']) {
-				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_USER_'));
+			if (Cot::$cfg['plugin']['comlist']['usertags'] && $row['com_authorid'] > 0) {
+				$t->assign(cot_generate_usertags($row, 'PAGE_ROW_USER_', htmlspecialchars($row['com_authorid'])));
 			}
 
       $com_author = htmlspecialchars($row['com_author']);
@@ -185,6 +185,8 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
 			$t->parse("MAIN.PAGE_ROW");
 			$jj++;
 		}
+
+		($jj == 1) && $t->parse("MAIN.NO_ROW");
 
 		$t->assign('PAGE_TOP_NEW_COMMENTS', $jn);
 
@@ -235,8 +237,6 @@ function sedby_comlist($tpl = 'comlist', $items = 0, $order = '', $extra = '', $
         'PAGE_TOP_RES' => $res,
       ));
     }
-
-		($jj==1) && $t->parse("MAIN.NONE");
 
 		/* === Hook === */
 		foreach (cot_getextplugins('comlist.tags') as $pl) {
